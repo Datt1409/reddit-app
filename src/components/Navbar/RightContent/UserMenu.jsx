@@ -27,7 +27,7 @@ export default function UserMenu({ user }) {
 
   const logout = async () => {
     await signOut(auth);
-    resetCommunityState();
+    // resetCommunityState();
   };
   return (
     <Menu>

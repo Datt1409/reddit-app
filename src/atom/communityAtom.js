@@ -1,7 +1,7 @@
 import { atom } from "recoil";
 import { Timestamp } from "firebase/firestore";
 
- const defaultCommunity = {
+const Community = {
   id: "",
   creatorId: "",
   numberOfMembers: 0,
@@ -10,7 +10,7 @@ import { Timestamp } from "firebase/firestore";
   imageURL: "",
 };
 
- const communitySnippet = {
+const communitySnippet = {
   communityId: "",
   isModerator: false,
   imageURL: "",
@@ -18,6 +18,8 @@ import { Timestamp } from "firebase/firestore";
 
 export const defaultCommunityState = {
   mySnippets: [communitySnippet],
+  currentCommunity: [Community],
+  snippetsFetched: false,
 };
 
 export const communityState = atom({

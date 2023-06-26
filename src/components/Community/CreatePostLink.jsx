@@ -1,5 +1,6 @@
 import { authModalState } from "@/atom/authModalAtom";
 import { auth } from "@/firebase/clientApp";
+import useDirectory from "@/hooks/useDirectory";
 import { Flex, Icon, Input } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -10,10 +11,11 @@ import { FaReddit } from "react-icons/fa";
 import { IoImageOutline } from "react-icons/io5";
 import { useSetRecoilState } from "recoil";
 
-const CreatePostLink = () => {
+export default function CreatePostLink() {
   const router = useRouter();
   const [user] = useAuthState(auth);
   const setAuthModalState = useSetRecoilState(authModalState);
+  const { toggleMenuOpen } = useDirectory();
 
   const onClick = () => {
     if (!user) {
@@ -22,7 +24,13 @@ const CreatePostLink = () => {
     }
 
     const { communityId } = router.query;
-    router.push(`/r/${communityId}/submit`);
+
+    if (communityId) {
+      router.push(`/r/${communityId}/submit`);
+      return;
+    }
+    // open directory menu
+    toggleMenuOpen();
   };
   return (
     <Flex
@@ -69,5 +77,4 @@ const CreatePostLink = () => {
       <Icon as={BsLink45Deg} fontSize={24} color="gray.400" cursor="pointer" />
     </Flex>
   );
-};
-export default CreatePostLink;
+}

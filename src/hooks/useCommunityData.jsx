@@ -10,6 +10,7 @@ import {
   increment,
   writeBatch,
 } from "firebase/firestore";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -21,6 +22,7 @@ export default function useCommunityData() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [user] = useAuthState(auth);
+  const router = useRouter();
 
   const onJoinOrLeaveCommunity = (communityData, isJoined) => {
     // is the user signed in?
@@ -51,6 +53,7 @@ export default function useCommunityData() {
       setCommunityStateValue((prev) => ({
         ...prev,
         mySnippets: snippets,
+        snippetsFetched: true,
       }));
     } catch (error) {
       console.log("getMySnippetError", error);
@@ -59,10 +62,41 @@ export default function useCommunityData() {
     setLoading(false);
   };
 
+  const getCommunityData = async (communityId) => {
+    try {
+      const communityDocRef = doc(firestore, "communities", communityId);
+      const communityDoc = await getDoc(communityDocRef);
+
+      setCommunityStateValue((prev) => ({
+        ...prev,
+        currentCommunity: {
+          id: communityDoc.id,
+          ...communityDoc.data(),
+        },
+      }));
+    } catch (error) {
+      console.log("getCommunityData error", error);
+    }
+  };
+
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setCommunityStateValue((prev) => ({
+        ...prev,
+        mySnippets: [],
+        snippetsFetched: false,
+      }));
+      return;
+    }
     getMySnippets();
   }, [user]);
+
+  useEffect(() => {
+    const { communityId } = router.query;
+    if (communityId && !communityStateValue.currentCommunity) {
+      getCommunityData(communityId);
+    }
+  }, [router.query, communityStateValue.currentCommunity]);
 
   const joinCommunity = async (communityData) => {
     // batch write
@@ -73,6 +107,7 @@ export default function useCommunityData() {
       const newSnippets = {
         communityId: communityData.id,
         imageURL: communityData.imageURL || "",
+        isModerator: user?.uid === communityData.creatorId,
       };
 
       batch.set(
@@ -102,6 +137,7 @@ export default function useCommunityData() {
 
     setLoading(false);
   };
+
   const leaveCommunity = async (communityId) => {
     // batch write
     try {

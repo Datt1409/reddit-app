@@ -17,7 +17,6 @@ import TextInput from "./PostForm/TextInput";
 import ImageUpload from "./PostForm/ImageUpload";
 import { useRouter } from "next/router";
 import {
-  Timestamp,
   addDoc,
   collection,
   serverTimestamp,
@@ -25,6 +24,8 @@ import {
 } from "firebase/firestore";
 import { firestore, storage } from "@/firebase/clientApp";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import useSelectFile from "@/hooks/useSelectFile";
+import Link from "./PostForm/Link";
 
 const formTabs = [
   {
@@ -49,22 +50,23 @@ const formTabs = [
   },
 ];
 
-export default function NewPostForms({ user }) {
+export default function NewPostForms({ user, communityImageURL }) {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState(formTabs[0].title);
   const [textInput, setTextInput] = useState({
     title: "",
     body: "",
   });
-  const [selectedFile, setSelectedFile] = useState();
+  // const [selectedFile, setSelectedFile] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
+  const { selectedFile, setSelectedFile, onSelectFile } = useSelectFile();
   const handleCreatePost = async () => {
     const { communityId } = router.query;
-    // create new object => type Post
+    // create new object
     const newPost = {
       communityId,
+      communityImageURL: communityImageURL || "",
       creatorId: user?.uid,
       creatorDisplayName: user?.email.split("@")[0],
       title: textInput.title,
@@ -101,18 +103,18 @@ export default function NewPostForms({ user }) {
     // redirect user back to the communityPage using the router
   };
 
-  const onSelectImage = (e) => {
-    const reader = new FileReader();
-    if (e.target.files?.[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-    }
+  // const onSelectImage = (e) => {
+  //   const reader = new FileReader();
+  //   if (e.target.files?.[0]) {
+  //     reader.readAsDataURL(e.target.files[0]);
+  //   }
 
-    reader.onload = (readerEvent) => {
-      if (readerEvent.target?.result) {
-        setSelectedFile(readerEvent.target.result);
-      }
-    };
-  };
+  //   reader.onload = (readerEvent) => {
+  //     if (readerEvent.target?.result) {
+  //       setSelectedFile(readerEvent.target.result);
+  //     }
+  //   };
+  // };
   const onTextChange = (e) => {
     const {
       target: { name, value },
@@ -148,11 +150,13 @@ export default function NewPostForms({ user }) {
         {selectedTab === "Images & Video" && (
           <ImageUpload
             selectedFile={selectedFile}
-            onSelectImage={onSelectImage}
-            setSelectedTab={setSelectedTab}
+            onSelectImage={onSelectFile}
             setSelectedFile={setSelectedFile}
+            setSelectedTab={setSelectedTab}
           />
         )}
+
+        {/* {selectedTab === "Link" && <Link />} */}
       </Flex>
       {error && (
         <Alert status="error">

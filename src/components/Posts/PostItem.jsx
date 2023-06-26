@@ -11,6 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { color } from "framer-motion";
 import moment from "moment";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { BsChat, BsDot } from "react-icons/bs";
@@ -32,12 +34,17 @@ export default function PostItem({
   onVote,
   onDeletePost,
   onSelectPost,
+  homePage,
+  postIndex,
 }) {
   const [loadingImage, setLoadingImage] = useState(true);
   const [error, setError] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const singlePostPage = !onSelectPost;
+  const router = useRouter();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     setLoadingDelete(true);
     try {
       const success = await onDeletePost(post);
@@ -47,6 +54,9 @@ export default function PostItem({
       }
 
       console.log("Successfully deleted");
+      if (singlePostPage) {
+        router.push(`/r/${post.communityId}`);
+      }
     } catch (error) {
       setError(error.message);
     }
@@ -56,19 +66,19 @@ export default function PostItem({
     <Flex
       border="1px solid"
       bg="white"
-      borderColor="gray.300"
-      borderRadius={4}
-      _hover={{ borderColor: "gray.500" }}
-      cursor="pointer"
-      onClick={onSelectPost}
+      borderColor={singlePostPage ? "white" : "gray.300"}
+      borderRadius={singlePostPage ? "4px 4px 0 0" : "4px"}
+      _hover={{ borderColor: singlePostPage ? "none" : "gray.500" }}
+      cursor={singlePostPage ? "unset" : "pointer"}
+      onClick={() => onSelectPost && onSelectPost(post)}
     >
       <Flex
         direction="column"
         align="center"
-        bg="gray.100"
+        bg={singlePostPage ? "none" : "gray.100"}
         p={2}
         width="40px"
-        borderRadius={4}
+        borderRadius={singlePostPage ? "0" : "3px 0 0 3px"}
       >
         <Icon
           as={
@@ -76,7 +86,7 @@ export default function PostItem({
           }
           color={userVoteValue === 1 ? "brand.100" : "gray.400"}
           fontSize={22}
-          onClick={onVote}
+          onClick={(e) => onVote(e, post, 1, post.communityId, postIndex)}
           cursor="pointer"
         />
         <Text>{post.voteStatus}</Text>
@@ -88,7 +98,7 @@ export default function PostItem({
           }
           color={userVoteValue === -1 ? "#4379ff" : "gray.400"}
           fontSize={22}
-          onClick={onVote}
+          onClick={(e) => onVote(e, post, -1, post.communityId, postIndex)}
           cursor="pointer"
         />
       </Flex>
@@ -102,6 +112,29 @@ export default function PostItem({
         <Stack spacing={1} p="10px">
           <Stack direction="row" spacing={0.6} align="center" fontSize="9pt">
             {/* Home page check */}
+            {homePage && (
+              <>
+                {post.communityImageURL ? (
+                  <Image
+                    src={post.communityImageURL}
+                    borderRadius="full"
+                    boxSize="18px"
+                    mr={2}
+                    alt="communityImageURL"
+                  />
+                ) : (
+                  <Icon as={FaReddit} fontSize="10pt" mr={1} color="blue.500" />
+                )}
+                <Link href={`r/${post.communityId}`}>
+                  <Text
+                    fontWeight={700}
+                    _hover={{ textDecoration: "underline" }}
+                    onClick={(e) => e.stopPropagation()}
+                  >{`r/${post.communityId}`}</Text>
+                </Link>
+                <Icon as={BsDot} color="gray.500" fontSize={8} />
+              </>
+            )}
             <Text>
               Posted by u/{post.creatorDisplayName}{" "}
               {moment(new Date(post.createAt?.seconds * 1000)).fromNow()}

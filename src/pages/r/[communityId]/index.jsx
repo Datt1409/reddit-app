@@ -25,7 +25,7 @@ export default function CommunityPage({ communityData }) {
       ...prev,
       currentCommunity: communityData,
     }));
-  }, []);
+  }, [communityData]);
 
   return (
     <>

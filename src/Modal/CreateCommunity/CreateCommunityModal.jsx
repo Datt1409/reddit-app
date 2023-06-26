@@ -29,14 +29,21 @@ import {
 } from "firebase/firestore";
 import { auth, firestore } from "@/firebase/clientApp";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
+import { communityState } from "@/atom/communityAtom";
+import { useRouter } from "next/router";
+import useDirectory from "@/hooks/useDirectory";
 
 export default function CreateCommunityModal({ open, handleClose }) {
   const [user] = useAuthState(auth);
+  const router = useRouter();
   const [communityName, setCommunityName] = useState("");
   const [characterRemaining, setCharacterRemaining] = useState(21);
-  const [commnunityType, setCommnunityType] = useState("public");
+  const [communityType, setCommunityType] = useState("public");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const setSnippetState = useSetRecoilState(communityState);
+  const { toggleMenuOpen } = useDirectory();
 
   const handleChange = (e) => {
     if (e.target.value.length > 21) return;
@@ -45,7 +52,7 @@ export default function CreateCommunityModal({ open, handleClose }) {
   };
 
   const changeCommunityType = (e) => {
-    setCommnunityType(e.target.name);
+    setCommunityType(e.target.name);
   };
 
   const handleCreateCommunity = async () => {
@@ -73,9 +80,9 @@ export default function CreateCommunityModal({ open, handleClose }) {
         // Create community
         transaction.set(communityDocRef, {
           creatorId: user?.uid,
-          createAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
           numberOfMembers: 1,
-          privacyType: commnunityType,
+          privacyType: communityType,
         });
 
         // Create community snippet
@@ -88,11 +95,17 @@ export default function CreateCommunityModal({ open, handleClose }) {
           }
         );
       });
+      handleClose();
+      toggleMenuOpen();
+      router.push(`r/${communityName}`);
     } catch (error) {
       console.log("handleCreateCommunity error", error);
       setError(error.message);
     }
-
+    setSnippetState((prev) => ({
+      ...prev,
+      mySnippets: [],
+    }));
     setLoading(false);
   };
 
@@ -152,7 +165,7 @@ export default function CreateCommunityModal({ open, handleClose }) {
                 <Stack spacing={2} mt={2}>
                   <Checkbox
                     name="public"
-                    isChecked={commnunityType === "public"}
+                    isChecked={communityType === "public"}
                     onChange={changeCommunityType}
                   >
                     <Flex align="center">
@@ -168,7 +181,7 @@ export default function CreateCommunityModal({ open, handleClose }) {
 
                   <Checkbox
                     name="restricted"
-                    isChecked={commnunityType === "restricted"}
+                    isChecked={communityType === "restricted"}
                     onChange={changeCommunityType}
                   >
                     <Flex align="center">
@@ -184,7 +197,7 @@ export default function CreateCommunityModal({ open, handleClose }) {
                   </Checkbox>
                   <Checkbox
                     name="private"
-                    isChecked={commnunityType === "private"}
+                    isChecked={communityType === "private"}
                     onChange={changeCommunityType}
                   >
                     <Flex align="center">

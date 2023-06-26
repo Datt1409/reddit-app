@@ -7,8 +7,31 @@ import {
 } from "react-icons/io5";
 import { GrAdd } from "react-icons/gr";
 import { Flex, Icon } from "@chakra-ui/react";
+import useDirectory from "@/hooks/useDirectory";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/clientApp";
+import { useRouter } from "next/router";
 
 export default function Icons() {
+  const [user] = useAuthState(auth);
+  const { toggleMenuOpen } = useDirectory();
+  const router = useRouter();
+
+  const onClick = () => {
+    if (!user) {
+      setAuthModalState({ open: true, view: "login" });
+      return;
+    }
+
+    const { communityId } = router.query;
+
+    if (communityId) {
+      router.push(`/r/${communityId}/submit`);
+      return;
+    }
+    // open directory menu
+    toggleMenuOpen();
+  };
   return (
     <Flex>
       <Flex
@@ -79,7 +102,7 @@ export default function Icons() {
           borderRadius={4}
           _hover={{ bg: "gray.200" }}
         >
-          <Icon as={GrAdd} fontSize={20} />
+          <Icon as={GrAdd} fontSize={20} onClick={onClick} />
         </Flex>
       </>
     </Flex>
