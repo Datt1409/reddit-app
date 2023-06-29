@@ -3,6 +3,7 @@ import { directoryMenuState } from "@/atom/directoryMenuAtom";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { FaReddit } from "react-icons/fa";
+import { TiHome } from "react-icons/ti";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 export default function useDirectory() {

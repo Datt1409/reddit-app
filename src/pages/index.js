@@ -118,14 +118,6 @@ export default function Home() {
     }
   };
 
-  const getPosts = async () => {
-    try {
-      const postsQuery = query;
-    } catch (error) {
-      console.log("getPosts error", error);
-    }
-  };
-
   // useEffect
 
   useEffect(() => {

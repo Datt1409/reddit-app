@@ -8,6 +8,7 @@ import Directory from "./Directory/Directory";
 import useDirectory from "@/hooks/useDirectory";
 import { defaultMenuItem } from "@/atom/directoryMenuAtom";
 import { useRouter } from "next/router";
+import { TiHome } from "react-icons/ti";
 
 export default function Navbar() {
   const [user, loading, error] = useAuthState(auth);
@@ -25,7 +26,15 @@ export default function Navbar() {
         align="center"
         width={{ base: "40px", md: "auto" }}
         mr={{ base: 0, md: 2 }}
-        onClick={() => onSelectMenuItem(defaultMenuItem)}
+        onClick={() =>
+          onSelectMenuItem({
+            displayText: "Home",
+            link: "/",
+            icon: TiHome,
+            iconColor: "black",
+            imageURL: "",
+          })
+        }
         cursor="pointer"
       >
         <Image src="/images/redditFace.svg" alt="reddit" height="30px" />
