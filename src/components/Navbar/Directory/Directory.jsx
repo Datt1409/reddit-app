@@ -41,7 +41,7 @@ export default function Directory() {
 
             <Flex display={{ base: "none", md: "flex" }}>
               <Text fontWeight={600} fontSize="10pt">
-                Hone
+                Home
               </Text>
             </Flex>
           </Flex>
