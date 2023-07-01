@@ -32,16 +32,33 @@ export default function Directory() {
           width={{ base: "auto", lg: "200px" }}
         >
           <Flex align="center">
-            <Icon
-              as={TiHome}
-              color="black"
-              fontSize={24}
-              mr={{ base: 1, md: 2 }}
-            />
-
+            {/* {directoryState.selectedMenuItem.imageURL ? (
+              <Image
+                src={directoryState.selectedMenuItem.imageURL}
+                borderRadius="full"
+                boxSize="24px"
+                mr={2}
+                alt=""
+              />
+            ) : (
+              <Icon
+                as={
+                  directoryState.selectedMenuItem
+                    ? directoryState.selectedMenuItem.icon
+                    : TiHome
+                }
+                color={directoryState.selectedMenuItem.iconColor}
+                fontSize={24}
+                mr={{ base: 1, md: 2 }}
+              />
+            )} */}
+            <Icon as={TiHome} fontSize={24} mr={{ base: 1, md: 2 }} />
             <Flex display={{ base: "none", md: "flex" }}>
               <Text fontWeight={600} fontSize="10pt">
-                Home
+                {/* {directoryState.selectedMenuItem
+                  ? directoryState.selectedMenuItem.displayText
+                  : "Home"} */}
+                  Home
               </Text>
             </Flex>
           </Flex>
