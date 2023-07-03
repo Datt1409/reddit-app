@@ -112,6 +112,8 @@ export default function Comments({ user, selectedPost, communityId }) {
     setLoadingDeleteId("");
   };
 
+  // const onEditComment = (comment) => {};
+
   const getPostComments = async () => {
     try {
       const commentsQuery = query(

@@ -24,8 +24,10 @@ import { useEffect, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { getServerSideProps } from "./r/[communityId]";
+import { useSetRecoilState } from "recoil";
 
-export default function Home() {
+export default function Home({ communityData }) {
   const [user, loadingUser] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
   const {
@@ -36,6 +38,7 @@ export default function Home() {
     onVote,
   } = usePosts();
   const { communityStateValue } = useCommunityData();
+  const setCommunityStateValue = useSetRecoilState(communityState);
 
   const buildUserHomeFeed = async () => {
     setLoading(true);
@@ -119,6 +122,12 @@ export default function Home() {
   };
 
   // useEffect
+  useEffect(() => {
+    setCommunityStateValue((prev) => ({
+      ...prev,
+      currentCommunity: communityData,
+    }));
+  }, [communityData]);
 
   useEffect(() => {
     if (communityStateValue.snippetsFetched) buildUserHomeFeed();

@@ -1,7 +1,10 @@
 import { SearchIcon } from "@chakra-ui/icons";
 import { Flex, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { useState } from "react";
 
 export default function SearchInput({ user }) {
+  const [textInput, setTextInput] = useState("");
+
   return (
     <Flex flexGrow={1} maxWidth={user ? "auto" : "600px"} mr={2} align="center">
       <InputGroup>
